@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <a href="{{ url_for('login') }}">Login</a>
+</head>
+<body>
+    <div class="gov-header"></div>
+    
+    <div class="gov-emblem">
+        <div class="emblem-content">
+            <div class="emblem-text">
+                <h1>भारत सरकार</h1>
+                <h1>Government of India</h1>
+                <p>Ministry of Skill Development & Entrepreneurship</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="satyamev-jayate">सत्यमेव जयते</div>
+
+    <nav>
+        <div class="nav-content">
+            <div class="nav-links">
+                <a href="/" class="active">Home</a>
+                <a href="#">Browse Internships</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+                <a href="#">Help</a>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-header">
+            <h2>National Internship Portal</h2>
+            <p>Find the perfect internship opportunity for your career growth</p>
+            <span class="beta-tag">Beta Version</span>
+        </div>
+
+        <!-- FORM -->
+        <div class="form-container">
+            <form id="internshipForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="qualification">Educational Qualification <span class="required">*</span></label>
+                        <select id="qualification" onchange="toggleOther('qualification', 'qualification_other')" required>
+                            <option value="">Select Qualification</option>
+                            <option value="B.Tech/BE">B.Tech/B.E</option>
+                            <option value="MBA/BBA">MBA/BBA</option>
+                            <option value="B.Sc/M.Sc">B.Sc/M.Sc</option>
+                            <option value="B.Com/M.Com">B.Com/M.Com</option>
+                            <option value="BA/MA">BA/MA</option>
+                            <option value="BCA/MCA">BCA/MCA</option>
+                            <option value="Any Graduate">Any Graduate</option>
+                            <option value="Diploma">Diploma</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="qualification_other" class="other-input" placeholder="Please specify your qualification">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sector_interested">Preferred Sector <span class="required">*</span></label>
+                        <select id="sector_interested" onchange="toggleOther('sector_interested', 'sector_other')" required>
+                            <option value="">Select Sector</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Finance">Banking & Finance</option>
+                            <option value="Marketing">Marketing & Sales</option>
+                            <option value="Human Resources">Human Resources</option>
+                            <option value="Operations">Operations & Supply Chain</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="sector_other" class="other-input" placeholder="Please specify the sector">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="skillsContainer">Technical Skills <span class="required">*</span></label>
+                    <div class="skills-container" id="skillsContainer">
+                        <div class="skill-checkbox"><input type="checkbox" id="python" value="Python"><label for="python">Python</label></div>
+                        <div class="skill-checkbox"><input type="checkbox" id="java" value="Java"><label for="java">Java</label></div>
+                        <div class="skill-checkbox"><input type="checkbox" id="javascript" value="JavaScript"><label for="javascript">JavaScript</label></div>
+                        <div class="skill-checkbox"><input type="checkbox" id="sql" value="SQL"><label for="sql">SQL</label></div>
+                        <div class="skill-checkbox"><input type="checkbox" id="react" value="React"><label for="react">React</label></div>
+                        <div class="skill-checkbox"><input type="checkbox" id="nodejs" value="Node.js"><label for="nodejs">Node.js</label></div>
+                        <div class="skill-checkbox"><input type="checkbox" id="ml" value="Machine Learning"><label for="ml">Machine Learning</label></div>
+                        <div class="skill-checkbox"><input type="checkbox" id="datascience" value="Data Science"><label for="datascience">Data Science</label></div>
+                        <div class="skill-checkbox"><input type="checkbox" id="other_skill" value="Other"><label for="other_skill">Other</label></div>
+                    </div>
+                    <input type="text" id="skills_other" class="other-input" placeholder="e.g., C++, Ruby, Go (comma-separated)">
+                </div>
+
+                <div class="form-row">
+                     <div class="form-group">
+                        <label for="location">Preferred Location</label>
+                        <input type="text" id="location" placeholder="e.g., Mumbai, Remote">
+                    </div>
+                     <div class="form-group">
+                        <label for="duration">Preferred Duration</label>
+                        <input type="text" id="duration" placeholder="e.g., 3 Months">
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="submit" class="btn-submit" id="submitBtn">Get Recommendations</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- LOADING -->
+        <div id="loadingContainer" class="loading-container" style="display: none;">
+            <div class="spinner"></div>
+            <p>Finding the best internships for you...</p>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="resultsContainer" class="results-container">
+            <div class="results-header">
+                <h2>Top 5 Recommended Internships</h2>
+            </div>
+            <div class="results-content" id="resultsContent"></div>
+        </div>
+
+        <!-- NO RESULTS -->
+        <div id="noResultsContainer" class="no-results" style="display: none;">
+             <h3>No Internships Found</h3>
+             <p>We couldn't find any internships matching your criteria right now.</p>
+             <button class="notify-btn" onclick="subscribeNotification()">Notify Me When Available</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 National Internship Portal, Government of India. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        let internshipData = [];
+
+        // Load CSV
+        async function loadInternshipData() {
+            try {
+                const response = await fetch("{{ url_for('static', filename='internship.csv') }}");
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const csvText = await response.text();
+
+                const lines = csvText.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+
+                internshipData = lines.slice(1).map(line => {
+                    const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)
+                                    .map(v => v.replace(/^"|"$/g, '').trim());
+
+                    let entry = {};
+                    headers.forEach((header, index) => {
+                        if (header.toLowerCase() === 'skills') {
+                            entry[header] = values[index] 
+                                ? values[index].split(/;|,/).map(skill => skill.trim()) 
+                                : [];
+                        } else {
+                            entry[header] = values[index] || 'N/A';
+                        }
+                    });
+                    return entry;
+                });
+
+                console.log("✅ Internship data loaded successfully!");
+            } catch (error) {
+                console.error("Could not load or parse internship data:", error);
+                alert("Error: Could not load internship data from 'static/internship.csv'. Please check the file path and format.");
+            }
+        }
+
+        // Toggle "Other"
+        function toggleOther(selectId, inputId) {
+            const select = document.getElementById(selectId);
+            const input = document.getElementById(inputId);
+            if (select.value === "Other") {
+                input.style.display = "block";
+                input.required = true;
+            } else {
+                input.style.display = "none";
+                input.required = false;
+                input.value = "";
+            }
+        }
+
+        // Other skills
+        document.getElementById('other_skill').addEventListener('change', function() {
+            const skillsOtherInput = document.getElementById('skills_other');
+            if (this.checked) {
+                skillsOtherInput.style.display = "block";
+                skillsOtherInput.required = true;
+            } else {
+                skillsOtherInput.style.display = "none";
+                skillsOtherInput.required = false;
+                skillsOtherInput.value = "";
+            }
+        });
+
+        function getSelectedSkills() {
+            const skills = [];
+            document.querySelectorAll('#skillsContainer input[type="checkbox"]:checked').forEach(checkbox => {
+                if (checkbox.value === "Other") {
+                    const otherSkills = document.getElementById('skills_other').value;
+                    if (otherSkills.trim()) {
+                        skills.push(...otherSkills.split(',').map(skill => skill.trim()));
+                    }
+                } else {
+                    skills.push(checkbox.value);
+                }
+            });
+            return skills;
+        }
+
+        // Match scoring
+        function calculateMatchScore(internship, userPrefs) {
+            let score = 0;
+
+            if (internship.sector && userPrefs.sector && internship.sector.toLowerCase().includes(userPrefs.sector.toLowerCase())) score += 30;
+            if (internship.qualification && (userPrefs.qualification === "Any Graduate" || internship.qualification === "Any Graduate" || internship.qualification === userPrefs.qualification)) score += 20;
+            if (userPrefs.skills.length > 0 && internship.skills && internship.skills.length > 0) {
+                const skillMatches = userPrefs.skills.filter(skill => internship.skills.some(intSkill => intSkill.toLowerCase().includes(skill.toLowerCase())));
+                score += (skillMatches.length / userPrefs.skills.length) * 40;
+            }
+            if (!userPrefs.location || userPrefs.location === "" || internship.location === "Remote" || (internship.location && internship.location.toLowerCase().includes(userPrefs.location.toLowerCase()))) score += 5;
+            if (!userPrefs.duration || userPrefs.duration === "" || (internship.duration && internship.duration.toLowerCase().includes(userPrefs.duration.toLowerCase()))) score += 5;
+
+            return Math.round(score);
+        }
+
+        // Filter & sort
+        function getRecommendedInternships(userPrefs) {
+            if (!internshipData || internshipData.length === 0) return [];
+            const scoredInternships = internshipData.map(internship => ({
+                ...internship,
+                matchScore: calculateMatchScore(internship, userPrefs)
+            }));
+            return scoredInternships.sort((a, b) => b.matchScore - a.matchScore).slice(0, 5);
+        }
+
+        // Internship card
+        function createInternshipCard(internship) {
+            const skillTags = (internship.skills || []).map(skill => `<span class="skill-tag">${skill}</span>`).join('');
+            const matchColor = internship.matchScore >= 70 ? '#4CAF50' : '#FF9800';
+
+            return `
+                <div class="internship-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <div class="internship-title">${internship.title || 'N/A'}</div>
+                        <span style="background: ${matchColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
+                            ${internship.matchScore}% Match
+                        </span>
+                    </div>
+                    <div class="internship-company">${internship.company || internship.company_name || 'N/A'}</div>
+                    <div class="internship-details">
+                        <div class="detail-item"><strong>Location:</strong> ${internship.location || 'N/A'}</div>
+                        <div class="detail-item"><strong>Duration:</strong> ${internship.duration || 'N/A'}</div>
+                        <div class="detail-item"><strong>Stipend:</strong> ${internship.stipend || 'N/A'}</div>
+                        <div class="detail-item"><strong>Type:</strong> ${internship.type || 'N/A'}</div>
+                    </div>
+                    <p style="color: #666; margin: 15px 0;">${internship.description || 'No description available.'}</p>
+                    <div class="skills-tags"><strong>Skills:</strong> ${skillTags || 'N/A'}</div>
+                </div>
+            `;
+        }
+
+        function subscribeNotification() {
+            alert("✅ You have been subscribed to notifications!");
+        }
+
+        // Handle form
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInternshipData();
+
+            const form = document.getElementById('internshipForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsContent = document.getElementById('resultsContent');
+            const loadingContainer = document.getElementById('loadingContainer');
+            const noResultsContainer = document.getElementById('noResultsContainer');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const qualification = document.getElementById('qualification').value;
+                const sector = document.getElementById('sector_interested').value;
+                const userPrefs = {
+                    qualification: qualification === "Other" ? document.getElementById('qualification_other').value : qualification,
+                    sector: sector === "Other" ? document.getElementById('sector_other').value : sector,
+                    skills: getSelectedSkills(),
+                    location: document.getElementById('location').value,
+                    duration: document.getElementById('duration').value
+                };
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Finding...';
+                loadingContainer.style.display = 'block';
+                resultsContainer.style.display = 'none';
+                noResultsContainer.style.display = 'none';
+
+                setTimeout(() => {
+                    const recommendations = getRecommendedInternships(userPrefs);
+                    
+                    loadingContainer.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Get Recommendations';
+
+                    if (recommendations.length > 0) {
+                        resultsContent.innerHTML = recommendations.map(createInternshipCard).join('');
+                        resultsContainer.style.display = 'block';
+                        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        noResultsContainer.style.display = 'block';
+                    }
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

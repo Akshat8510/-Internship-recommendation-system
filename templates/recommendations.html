@@ -1,0 +1,33 @@
+    import pandas as pd
+
+    def load_internships(path="static/internships.csv"):
+        """Load internships dataset"""
+        return pd.read_csv(path)
+
+    def recommend_internships(user_skills, df):
+        """
+        Recommend internships based on user skills.
+        Returns a list of dicts with internship info and match score.
+        """
+        results = []
+        user_skills = [s.strip().lower() for s in user_skills]
+        for _, row in df.iterrows():
+            internship_skills = [s.strip().lower() for s in row['required_skills'].split(",")]
+            match_score = len(set(user_skills).intersection(internship_skills))
+
+            if match_score > 0:  # Only recommend if at least one skill matches
+                results.append({
+                    "internship_id": row['internship_id'],
+                    "company_name": row['company_name'],
+                    "title": row['title'],
+                    "sector": row['sector'],
+                    "required_skills": row['required_skills'],
+                    "required_education": row['required_education'],
+                    "location": row['location'],
+                    "stipend": row['stipend'],
+                    "match_score": match_score
+                })
+
+        # Sort by match score (descending)
+        results = sorted(results, key=lambda x: x['match_score'], reverse=True)
+        return results
